@@ -1,0 +1,14 @@
+<div class="jumbotron">
+    <p class="lead">팔로워 수 : {{person.followers.all|length}} / 팔로잉 수 : {{person.followings.all|length}}</p>
+
+    {% if request.user != person %}
+        <form action="{%url 'accounts:follow' person.pk%}" method='POST'>
+            {% csrf_token %}
+            {% if request.user in person.followers.all %}
+            <button class='btn btn-secondary'>Unfollow</button>
+            {% else %}
+            <button class='btn btn-primary'>Follow</button>
+            {% endif %}
+        </form>
+    {% endif %}
+</div>

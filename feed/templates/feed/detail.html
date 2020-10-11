@@ -1,0 +1,130 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <h1 class="text-center">{{article.pk}}번 글</h1>
+  {% if article.image %}
+  <img
+    src="{{ article.image.url }}"
+    alt="{{ article.image }}"
+    class="col-10 offset-1"
+  />
+  {% else %}
+  <p><strong>이미지가 없습니다.</strong></p>
+  {% endif %}
+</div>
+
+<div class="mb-2 pb-2">
+  <a href="{% url 'account:profile' article.user.pk%}"
+    ><b class="text-dark">{{article.user}}</b></a
+  >
+</div>
+<div class="container border border-gray rounded">
+  {{article.content|linebreaks}}
+</div>
+
+<p>작성시간: {{article.created_at}}</p>
+
+<hr />
+<div class="justify-content-between d-flex">
+  <div class="align-content-center">
+    {% if request.user in article.like_users.all %}
+    <a href="{% url 'feed:like' article.pk%}"
+      ><span style="font-size: 2em; color: Tomato"
+        ><i class="fas fa-heart"></i></span
+    ></a>
+    {% else %}
+    <a href="{% url 'feed:like' article.pk%}"
+      ><span style="font-size: 2em; color: Tomato"
+        ><i class="far fa-heart"></i> </span
+    ></a>
+    {% endif %}
+    <button
+      type="button"
+      class="btn btn-link mb-3"
+      data-toggle="modal"
+      data-target="#like_users"
+    >
+      {{article.like_users.all|length}}명이 이 글을 좋아합니다.
+    </button>
+    <div
+      class="modal fade"
+      id="like_users"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="like_usersTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">
+              좋아요를 누른 사람
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for user in article.like_users.all %}
+            <a href="{% url 'account:profile' user.pk%}"
+              ><h5>{{user.username}}</h5></a
+            >
+
+            <hr />
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="align-content-self">
+  {% if article.user == request.user %}
+    <a href="{% url 'feed:update' article.pk%}" class="btn btn-primary pt-2 pb-1 font-weight-bold" >수정하기</a>
+    <a href="{% url 'feed:delete' article.pk%}" class="btn btn-primary pt-2 pb-1 font-weight-bold" >삭제하기</a>
+  {% endif %}
+  <a href="{% url 'feed:index'%}" class="btn btn-primary pt-2 pb-1 font-weight-bold" >목록으로</a>
+  </div>
+</div>
+
+<h4><댓글 목록></h4>
+<br />
+{% for comment in comments %}
+
+<p><b>{{comment.user}}</b>의 댓글 : {{comment.content}}</p>
+<br />
+{% endfor %}
+<div class="pagination justify-content-center font-weight-bold">
+  <span class="step-links">
+    {% if comments.has_previous %}
+    <a href="?page=1"> &laquo; </a>
+    <a href="?page={{ comments.previous_page_number }}"
+      >{{ comments.previous_page_number }}</a
+    >
+    {% endif %}
+    <span class="current"> {{ comments.number }} </span>
+    {% if comments.has_next %}
+    <a href="?page={{ comments.next_page_number }}"
+      >{{ comments.next_page_number }}</a
+    >
+    <a href="?page={{ comments.paginator.num_pages }}"> &raquo; </a>
+    {% endif %}
+  </span>
+</div>
+<form action="{% url 'feed:comments' article.pk%}" method="POST">
+  {% csrf_token %} {{commentform}}
+  <input type="submit" value="댓글작성" />
+</form>
+{% endblock %}

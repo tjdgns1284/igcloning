@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3 class="text-center">정말로 삭제하시겠습니까???</h3>
+<div class="container d-flex justify-content-center">
+<form action="{% url 'feed:delete' article.pk%}" method="POST">
+{% csrf_token %}
+<button type="submit" class="btn btn-secondary">삭제</button>
+</form>
+<button class="btn btn-secondary"><a href="{% url 'feed:detail' article.pk%}">아니요</a> </button>
+
+</div>
+{% endblock  %}

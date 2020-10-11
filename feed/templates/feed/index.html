@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center">글 목록</h1>
+{% for article in articles %}
+<div class="container border border-black rounded">
+  <a href="{% url 'feed:detail' article.pk%}">
+    {% if article.image %}
+    <img
+      src="{{ article.image.url }}"
+      alt="{{ article.image }}"
+      class="col-8 offset-2"
+    />
+    {% else %}
+    <p><strong>이미지가 없습니다.</strong></p>
+    {% endif %}
+  </a>
+
+  <div class="col-12">
+    <button
+      type="button"
+      class="btn btn-link"
+      data-toggle="modal"
+      data-target="#like_users{{article.pk}}"
+    >
+      {{article.like_users.all|length}}명이 이 글을 좋아합니다.
+    </button>
+    <div
+      class="modal fade"
+      id="like_users{{article.pk}}"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="like_usersTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">
+              좋아요를 누른 사람
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for user in article.like_users.all %}
+            <a href="{% url 'account:profile' user.pk%}"
+              ><h5>{{user.username}}</h5></a
+            >
+
+            <hr />
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="ml-4 pl-1">
+      {% if request.user in article.like_users.all %}
+      <a href="{% url 'feed:like' article.pk%}"
+        ><span style="font-size: 2em; color: Tomato"
+          ><i class="fas fa-heart"></i></span
+      ></a>
+      {% else %}
+      <a href="{% url 'feed:like' article.pk%}"
+        ><span style="font-size: 2em; color: Tomato"
+          ><i class="far fa-heart"></i> </span
+      ></a>
+      {% endif %}
+    </div>
+    <div class="col-1 ml-0">
+      <span style="font-size: 2em; color: black">
+        <i
+          class="far fa-comment"
+          type="button"
+          data-toggle="modal"
+          data-target="#comments{{article.pk}}"
+        ></i>
+      </span>
+    </div>
+    <div
+      class="modal fade"
+      id="comments{{article.pk}}"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="commentsTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">댓글</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for comment in article.comment_set.all %}
+            <p><b>{{comment.user.username}}</b> {{comment.content}}</p>
+
+            <hr />
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <p><b>{{article.user}}</b> {{article.content|linebreaks}}</p>
+  </div>
+</div>
+<hr />
+{% endfor %}
+<div class="pagination justify-content-center font-weight-bold">
+  <span class="step-links">
+    {% if articles.has_previous %}
+    <a href="?page=1" class="btn btn-primary"> &laquo; </a>
+    <a href="?page={{ articles.previous_page_number }}" class="btn btn-primary"
+      >{{ articles.previous_page_number }}</a
+    >
+    {% endif %}
+    <span class="current btn btn-primary"> {{ articles.number }} </span>
+    {% if articles.has_next %}
+    <a href="?page={{ articles.next_page_number }}" class="btn btn-primary"
+      >{{ articles.next_page_number }}</a
+    >
+    <a href="?page={{ articles.paginator.num_pages }}" class="btn btn-primary">
+      &raquo;
+    </a>
+    {% endif %}
+  </span>
+</div>
+{% endblock %}

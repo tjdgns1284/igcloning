@@ -1,0 +1,33 @@
+{% extends 'base.html' %} {% block content %}
+<h1 class="text-center">{{person.username}}의 프로필</h1>
+<hr />
+{% include 'account/_follow.html' %}
+<h3>{{person.username}}이 작성한 게시글</h3>
+<div class="row">
+{% for article in person.article_set.all reversed %}
+<div class="card col-3 mr-5" >
+  <img class="card-img-top " src="{{ article.image.url }}"
+    alt="{{ article.image }}" >
+  <div class="card-body ">
+    <p class="card-text">
+      {{article.content}}
+    </p>
+    <a href="{% url 'feed:detail' article.pk%}" class="btn btn-primary">자세히 보기 </a>
+  </div>
+</div>
+{% endfor %}
+</div>
+<hr />
+<h3>{{person.username}}이 작성한 댓글</h3>
+{% for comment in person.comment_set.all %}
+<p>{{comment.article.content}}-{{comment.content}}</p>
+
+{% endfor %}
+<hr />
+<h3>{{person.username}}이 좋아요한 게시글</h3>
+{% for like_article in person.like_articles.all %}
+<p>
+  {{person.username}}님이 {{like_article.user.username}}님의
+  {{like_article.content}}글을 좋아합니다.
+</p>
+{% endfor %} {% endblock %}
