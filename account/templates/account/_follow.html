@@ -1,14 +1,52 @@
 <div class="jumbotron">
-    <p class="lead">팔로워 수 : {{person.followers.all|length}} / 팔로잉 수 : {{person.followings.all|length}}</p>
+    <p class="lead">팔로워 수 : <span id="followers-num">{{person.followers.all|length}}</span> / 팔로잉 수 : <span id="followings-num">{{person.followings.all|length}}</span></p>
 
     {% if request.user != person %}
-        <form action="{%url 'accounts:follow' person.pk%}" method='POST'>
-            {% csrf_token %}
+        <form id="follow-form" data-user-id="{{person.pk}}">
             {% if request.user in person.followers.all %}
-            <button class='btn btn-secondary'>Unfollow</button>
+            <button class='btn btn-secondary' id="follow-button">Unfollow</button>
             {% else %}
-            <button class='btn btn-primary'>Follow</button>
+            <button class='btn btn-primary' id="follow-button">Follow</button>
             {% endif %}
         </form>
     {% endif %}
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+const followForm = document.querySelector('#follow-form')
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+followForm.addEventListener('submit', function(event) {
+  event.preventDefault()
+    const userId = event.target.dataset.userId
+  axios.post(`http://127.0.0.1:8000/account/${userId}/follow/`,{},{
+    headers: {'X-CSRFToken': csrftoken}
+  })
+    .then ( function (res) {
+      console.log(res)
+      const followed = res.data.followed
+      const followings = res.data.followings
+      const followers = res.data.followers
+      const followButton = document.querySelector('#follow-button')
+      if (followed) {
+        followButton.innerText = 'Unfollow'
+        followButton.classList.remove('btn-primary')
+        followButton.classList.add('btn-secondary')
+      } else {
+        followButton.innerText = 'Follow'
+        followButton.classList.remove('btn-secondary')
+        followButton.classList.add('btn-primary')
+      }
+      const followersNum = document.querySelector('#followers-num')
+      const followingsNum = document.querySelector('#followings-num')
+      followersNum.innerText = followers
+      followingsNum.innerText = followings
+
+    })
+    .catch ( function (err) {
+      console.log(err)
+    })
+})
+
+
+</script>

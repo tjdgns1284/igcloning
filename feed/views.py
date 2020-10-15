@@ -1,3 +1,4 @@
+from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -108,15 +109,21 @@ def comments(request, article_pk):
         return render(request, 'feed/detail.html', context)
     return redirect('account:login')
 
-
+@require_POST
 def like(request, article_pk):
     if request.user.is_authenticated:
         article = get_object_or_404(Article,pk=article_pk)
         if request.user in article.like_users.all():
             article.like_users.remove(request.user)
+            liked = False
         else:
             article.like_users.add(request.user)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            liked = True
+        like_status = {
+            'liked':liked,
+            'like_count':article.like_users.count(),
+        }
+        return JsonResponse(like_status)
     else:
         return redirect('account:login')
 

@@ -22,7 +22,7 @@
       data-toggle="modal"
       data-target="#like_users{{article.pk}}"
     >
-      {{article.like_users.all|length}}명이 이 글을 좋아합니다.
+      <span id="like-count-{{article.pk}}">{{article.like_users.all|length}}</span>명이 이 글을 좋아합니다.
     </button>
     <div
       class="modal fade"
@@ -72,15 +72,20 @@
   <div class="row">
     <div class="ml-4 pl-1">
       {% if request.user in article.like_users.all %}
-      <a href="{% url 'feed:like' article.pk%}"
-        ><span style="font-size: 2em; color: Tomato"
-          ><i class="fas fa-heart"></i></span
-      ></a>
+      <form  class="like-form" data-article-id="{{article.pk}}"
+        >
+        <button class="btn btn-link" class="btn btn-link"><span style="font-size: 2em; color: Tomato" 
+          ><i class="fas fa-heart" id="like-{{article.pk}}"></i></span
+      ></button class="btn btn-link" class="btn btn-link"></form>
       {% else %}
-      <a href="{% url 'feed:like' article.pk%}"
-        ><span style="font-size: 2em; color: Tomato"
-          ><i class="far fa-heart"></i> </span
-      ></a>
+      <form  class="like-form" data-article-id="{{article.pk}}"
+        >
+        <button class="btn btn-link">
+          <span style="font-size: 2em; color: Tomato" 
+          ><i class="far fa-heart" id="like-{{article.pk}}"></i> </span
+      >
+    </button class="btn btn-link">
+  </form>
       {% endif %}
     </div>
     <div class="col-1 ml-0">
@@ -160,4 +165,49 @@
     {% endif %}
   </span>
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+  const forms = document.querySelectorAll('.like-form')
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+ 
+
+  forms.forEach(function (form) {
+    form.addEventListener('submit',function (event) {
+      event.preventDefault()
+      const articleId = event.target.dataset.articleId
+      
+      
+      axios.post(`http://127.0.0.1:8000/feed/${articleId}/like/`,{},{
+        headers: {'X-CSRFToken': csrftoken}
+      })
+        .then(function (res){
+          const liked = res.data.liked
+          const likeCount = res.data.like_count
+          const likeCountSpan = document.querySelector(`#like-count-${articleId}`)
+          likeCountSpan.innerText = likeCount
+          
+          const likeIcon =  document.querySelector(`#like-${articleId}`)
+          if (liked){
+            likeIcon.classList.remove('far')
+            likeIcon.classList.add('fas')
+          } else {
+            likeIcon.classList.add('far')
+            likeIcon.classList.remove('fas')}
+          
+          
+
+        })
+        .catch(function (err){
+          console.log(err)
+        })
+
+    })
+  })
+
+  </script>
+
+
 {% endblock %}

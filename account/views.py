@@ -4,6 +4,8 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.views.decorators.http import require_POST, require_http_methods
 from .forms import CustomUserCreationForm
+from django.http.response import JsonResponse
+
 # Create your views here.
 
 
@@ -70,8 +72,16 @@ def follow(request, user_pk):
         if me != you:
             if you.followers.filter(pk=me.pk).exists():
                 you.followers.remove(me)
+                followed = False
             else:
                 you.followers.add(me)
-        return redirect('account:profile', you.pk)
+                followed = True
+        follow_status = {
+            'followers':you.followers.count(),
+            'followings':you.followings.count(),
+            'followed':followed,
+            }
+        return JsonResponse(follow_status)
+        
     else:
         return redirect('account:login')
