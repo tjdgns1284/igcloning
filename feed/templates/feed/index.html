@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1 class="text-center">글 목록</h1>
+
+<h1 class="text-center" style="font-family:fantasy;font-style:italic;"><b> CopyCAT</b><span style="color: dodgerblue"></span></h1>
 {% for article in articles %}
 <div class="container border border-black rounded">
   <a href="{% url 'feed:detail' article.pk%}">
@@ -8,7 +9,7 @@
     <img
       src="{{ article.image.url }}"
       alt="{{ article.image }}"
-      class="col-8 offset-2"
+      class="col-12"
     />
     {% else %}
     <p><strong>이미지가 없습니다.</strong></p>
@@ -141,7 +142,7 @@
   </div>
 
   <div class="col-12">
-    <p><b>{{article.user}}</b> {{article.content|linebreaks}}</p>
+    <p><a href="{% url 'account:profile' article.user.pk%}"><b>{{article.user}}</b></a> {{article.content|linebreaks}}</p>
   </div>
 </div>
 <hr />

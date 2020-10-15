@@ -16,22 +16,26 @@
     ></script>
   </head>
   <body>
+  
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav align-items-center">
+        
+      
+        <div class="navbar-nav align-items-center offset-5">
           <a class="nav-link active" href="{% url 'feed:index'%}">
-            <span style="font-size: 3em; color: dodgerblue">
-              <i class="fas fa-camera-retro"></i>
+            <span style="font-size: 3em; color: dodgerblue; font-family:fantasy;font-style:italic;">
+              <i class="fas fa-cat"></i> <b>CopyCAT</b>
             </span>
           </a>
+          
+        </div>
+        <div class="navbar-nav align-items-center ml-auto">
+          {% if user.is_authenticated %}
           <a class="nav-link acive" href="{% url 'feed:create'%}">
             <span style="font-size: 3em; color: Mediumslateblue">
               <i class="fas fa-images"></i>
             </span>
           </a>
-        </div>
-        <div class="navbar-nav align-items-center ml-auto">
-          {% if user.is_authenticated %}
           <a class="nav-link" href="{% url 'account:profile' request.user.pk%}"
             >
             <span style="font-size: 3em; color: green">

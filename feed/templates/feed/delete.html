@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h3 class="text-center">정말로 삭제하시겠습니까???</h3>
+<h3 class="text-center" style="font-family:fantasy;font-style:italic;">정말로 삭제하시겠습니까???</h3>
 <div class="container d-flex justify-content-center">
 <form action="{% url 'feed:delete' article.pk%}" method="POST">
 {% csrf_token %}
