@@ -1,4 +1,7 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+{% load extras %}
+
+{% block content %}
 <div class="container">
   <h1 class="text-center" style="font-family:fantasy;font-style:italic;"><b>#{{article.pk}}</b></h1>
   {% if article.image %}
@@ -18,7 +21,7 @@
   >
 </div>
 <div class="container border border-gray rounded">
-  {{article.content|linebreaks}}
+  {{article.content|linebreaks|hashtag_link}}
 </div>
 
 <p>작성시간: {{article.created_at}}</p>

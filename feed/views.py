@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .forms import CommentForm, ArticleForm
-from .models import Article, Comment
+from .models import Article, Comment, Hashtag
 from django.http import HttpResponseRedirect
 
 
@@ -30,6 +30,36 @@ def create(request):
             article = form.save(commit=False)
             article.user = request.user
             article.save()
+            for word in article.content.split():
+                if word.startswith('#'):
+                    hashtag, created = Hashtag.objects.get_or_create(content = word)
+                    article.hashtags.add(hashtag)
+                elif '#' in word:
+                    
+                    small_word = ''
+                    has = 0 
+                    for str in word:
+
+                        if str == '#':
+                            has =1 
+                            small_word += str
+                        else: 
+                            if has == 0:
+                                continue 
+                            else:
+                                if str != '<':
+                                    small_word += str
+                                else: 
+                                    hashtag, created = Hashtag.objects.get_or_create(content = small_word)
+                                    article.hashtags.add(hashtag)
+                                    has = 0
+
+                    if has ==1: 
+                        hashtag, created = Hashtag.objects.get_or_create(content = small_word)
+                        article.hashtags.add(hashtag)
+                        has = 0
+                        
+            
             return redirect('feed:detail', article.pk)
     else:
         form = ArticleForm()
@@ -39,7 +69,7 @@ def create(request):
     return render(request, 'feed/create.html', context)
 
 
-@login_required
+
 @require_http_methods(['GET'])
 def detail(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
@@ -126,5 +156,15 @@ def like(request, article_pk):
         return JsonResponse(like_status)
     else:
         return redirect('account:login')
+
+
+def hashtag(request, hashtag_pk):
+    tag = get_object_or_404(Hashtag,pk=hashtag_pk)
+    articles = tag.tagged_articles.all()
+    context = {
+        'tag':tag,
+        'articles':articles,
+    }
+    return render(request,'feed/hashtag.html',context)
 
         

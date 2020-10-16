@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-center" style="font-family:fantasy;font-style:italic;"><b>{{tag.content}}</b></h1>
+<div>
+{% for article in articles %}
+
+<p>내용 : {{article.content}}</p>
+<hr>
+{% endfor %}
+</div>
+
+
+{% endblock  %}

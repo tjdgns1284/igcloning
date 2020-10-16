@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+
+{% load extras %}
 {% block content %}
+
 
 <h1 class="text-center" style="font-family:fantasy;font-style:italic;"><b> CopyCAT</b><span style="color: dodgerblue"></span></h1>
 {% for article in articles %}
@@ -142,7 +145,7 @@
   </div>
 
   <div class="col-12">
-    <p><a href="{% url 'account:profile' article.user.pk%}"><b>{{article.user}}</b></a> {{article.content|linebreaks}}</p>
+    <p><a href="{% url 'account:profile' article.user.pk%}"><b>{{article.user}}</b></a> {{article.content|linebreaks|hashtag_link}}</p>
   </div>
 </div>
 <hr />
