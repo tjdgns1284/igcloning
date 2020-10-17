@@ -34,30 +34,7 @@ def create(request):
                 if word.startswith('#'):
                     hashtag, created = Hashtag.objects.get_or_create(content = word)
                     article.hashtags.add(hashtag)
-                elif '#' in word:
-                    
-                    small_word = ''
-                    has = 0 
-                    for str in word:
-
-                        if str == '#':
-                            has =1 
-                            small_word += str
-                        else: 
-                            if has == 0:
-                                continue 
-                            else:
-                                if str != '<':
-                                    small_word += str
-                                else: 
-                                    hashtag, created = Hashtag.objects.get_or_create(content = small_word)
-                                    article.hashtags.add(hashtag)
-                                    has = 0
-
-                    if has ==1: 
-                        hashtag, created = Hashtag.objects.get_or_create(content = small_word)
-                        article.hashtags.add(hashtag)
-                        has = 0
+                
                         
             
             return redirect('feed:detail', article.pk)
